@@ -351,8 +351,8 @@
     </h1>
     <p class="tag">Las cartas no predicen tu destino: iluminan las decisiones que ya llevas dentro.</p>
     <div class="cta-row">
-      <a href="#contacto" class="btn btn-gold">Agenda tu lectura</a>
-      <a href="#servicios" class="btn btn-outline">Ver servicios</a>
+      <a href="#contacto" class="btn btn-gold" data-track="click_agendar_hero">Agenda tu lectura</a>
+      <a href="#servicios" class="btn btn-outline" data-track="click_ver_servicios">Ver servicios</a>
     </div>
 
     <div class="cards-fan">
@@ -553,15 +553,15 @@
       </form>
 
       <div class="quick-links">
-        <a href="https://wa.me/message/63JN66VGVVHXO1" target="_blank" rel="noopener">
+        <a href="https://wa.me/message/63JN66VGVVHXO1" target="_blank" rel="noopener" data-track="click_whatsapp_directo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.5 8.5 0 01-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1121 11.5z"/></svg>
           WhatsApp
         </a>
-        <a href="https://instagram.com/ale_tarot_21" target="_blank" rel="noopener">
+        <a href="https://instagram.com/ale_tarot_21" target="_blank" rel="noopener" data-track="click_instagram">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
           @ale_tarot_21
         </a>
-        <a href="tel:+573215684391">
+        <a href="tel:+573215684391" data-track="click_llamar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2z"/><path d="M12 18h.01"/></svg>
           321 568 4391
         </a>
@@ -576,10 +576,10 @@
   <div class="wrap">
     <span class="signature">Ale Tarot</span>
     <div class="socials">
-      <a href="https://instagram.com/ale_tarot_21" target="_blank" rel="noopener" aria-label="Instagram">
+      <a href="https://instagram.com/ale_tarot_21" target="_blank" rel="noopener" aria-label="Instagram" data-track="click_instagram_footer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
       </a>
-      <a href="https://wa.me/message/63JN66VGVVHXO1" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <a href="https://wa.me/message/63JN66VGVVHXO1" target="_blank" rel="noopener" aria-label="WhatsApp" data-track="click_whatsapp_footer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.5 8.5 0 01-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1121 11.5z"/></svg>
       </a>
     </div>
@@ -616,9 +616,31 @@
       if(ig) mensaje += `Instagram: ${ig}%0A`;
       if(consulta) mensaje += `Consulta: ${consulta}%0A`;
 
+      // Evento de Google Analytics: formulario de cita enviado
+      if(typeof gtag === 'function'){
+        gtag('event', 'generate_lead', {
+          event_category: 'formulario_agenda',
+          event_label: servicio,
+          servicio_seleccionado: servicio
+        });
+      }
+
       window.open(`https://wa.me/573215684391?text=${mensaje}`, '_blank');
     });
   }
+
+  // Rastreo genérico de clics en botones/enlaces marcados con data-track
+  document.querySelectorAll('[data-track]').forEach(function(el){
+    el.addEventListener('click', function(){
+      if(typeof gtag === 'function'){
+        const etiqueta = el.textContent.trim() || el.getAttribute('aria-label') || el.getAttribute('data-track');
+        gtag('event', el.getAttribute('data-track'), {
+          event_category: 'interaccion',
+          event_label: etiqueta
+        });
+      }
+    });
+  });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
